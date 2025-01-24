@@ -1,4 +1,4 @@
-package com.hszg.demo;
+package com.hszg.demo.controller;
 
 import com.hszg.demo.data.api.ExerciseManager;
 import com.hszg.demo.model.Exercise;
@@ -22,7 +22,7 @@ public class ExerciseController {
 
     @GetMapping("me")
     public String runningTest() {
-        return "worka";
+        return "works";
     }
 
 

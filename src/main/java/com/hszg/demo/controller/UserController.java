@@ -2,7 +2,6 @@ package com.hszg.demo.controller;
 
 import com.hszg.demo.data.api.UserManager;
 import com.hszg.demo.model.User;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
