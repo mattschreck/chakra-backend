@@ -15,10 +15,9 @@ public class WeatherController {
         this.weatherService = weatherService;
     }
 
-    // GET /api/weather?city=Cottbus
+    // GET /api/weather?city=Berlin
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public String getWeather(@RequestParam String city) {
-        // Ruft deinen Service auf, gibt direkt das JSON-String zurück
         return weatherService.getCurrentWeather(city);
     }
 }

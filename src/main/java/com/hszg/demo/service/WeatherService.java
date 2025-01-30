@@ -21,51 +21,52 @@ public class WeatherService {
     private final RestTemplate restTemplate = new RestTemplate();
 
     /**
-     * Ruft das aktuelle Wetter für 'city' ab und gibt es als vereinfachtes JSON (String) zurück.
+     * Holt aktuelles Wetter für city via OpenWeatherMap
+     * und gibt ein kleines JSON-Objekt zurück (als String),
+     * z.B. {"city":"Berlin","temperature":10.0,"description":"clear sky","icon":"01d"}
      */
     public String getCurrentWeather(String city) {
         try {
-            // Beispiel-URL: https://api.openweathermap.org/data/2.5/weather?q=Cottbus&appid=APIKEY&units=metric
+            // URL z.B. https://api.openweathermap.org/data/2.5/weather?q=Berlin&appid=XYZ&units=metric
             String url = String.format("%s/weather?q=%s&appid=%s&units=metric",
                     baseUrl, city, apiKey);
 
             ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
-
             if (response.getStatusCode() == HttpStatus.OK) {
-                // Original-Antwort als String
                 String jsonBody = response.getBody();
 
-                // Jackson ObjectMapper
+                // Jackson zum Parsen
                 ObjectMapper mapper = new ObjectMapper();
-                // in ein JsonNode parsen
                 JsonNode root = mapper.readTree(jsonBody);
 
-                // temp in root.main.temp
+                // Hole Temperatur
                 double temp = root.path("main").path("temp").asDouble();
-                // description in root.weather[0].description
+                // Hole Beschreibung
                 String description = root.path("weather").get(0).path("description").asText();
+                // Hole Icon-Code z.B. "04d"
+                String iconCode = root.path("weather").get(0).path("icon").asText();
 
-                // Jetzt ein eigenes "leichtes" JSON bauen
+                // Baue eigenes "leichtes" JSON
                 ObjectNode result = mapper.createObjectNode();
                 result.put("city", city);
                 result.put("temperature", temp);
                 result.put("description", description);
+                result.put("icon", iconCode);
 
-                return result.toString();  // -> {"city":"Cottbus","temperature":13.37,"description":"broken clouds"}
-
+                return result.toString();
             } else {
-                // Wenn OWM-Call fehlschlägt
+                // Fehlerfall (z.B. 404 city not found)
                 ObjectMapper mapper = new ObjectMapper();
-                ObjectNode error = mapper.createObjectNode();
-                error.put("error", "API call failed with status: " + response.getStatusCodeValue());
-                return error.toString();
+                ObjectNode errorJson = mapper.createObjectNode();
+                errorJson.put("error", "API call failed, status = " + response.getStatusCodeValue());
+                return errorJson.toString();
             }
         } catch (Exception e) {
-            // Falls ein Fehler auftritt (z. B. falsche Stadt)
+            // Catch generische Fehler
             ObjectMapper mapper = new ObjectMapper();
-            ObjectNode error = mapper.createObjectNode();
-            error.put("error", e.getMessage());
-            return error.toString();
+            ObjectNode errorJson = mapper.createObjectNode();
+            errorJson.put("error", e.getMessage());
+            return errorJson.toString();
         }
     }
 }
