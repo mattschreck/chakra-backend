@@ -3,12 +3,12 @@ package com.hszg.demo.data.api;
 import com.hszg.demo.model.User;
 
 public interface UserManager {
-    // Registrieren
+    // Registriert einen neuen User
     User registerUser(String name, String email, String password) throws Exception;
 
-    // Finden nach E-Mail
+    // Findet User anhand E-Mail
     User findByEmail(String email);
 
-    // Optional: Login
+    // Login
     User loginUser(String email, String password);
 }

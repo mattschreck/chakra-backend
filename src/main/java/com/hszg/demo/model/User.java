@@ -1,32 +1,26 @@
 package com.hszg.demo.model;
 
-import java.util.UUID;
-
 public class User {
-
-    private String id;       // Eindeutige ID (z.B. generiert)
+    private Long id;
     private String name;
-    private String email;    // Muss eindeutig sein
-    private String password; // Ungehasht (nur Demo)
-    private String token;    // Z.B. Auth-Token
+    private String email;
+    private String password;
+    private String token;
 
     public User() {
-        // Leerer Konstruktor für Spring
     }
 
     public User(String name, String email, String password) {
-        this.id = UUID.randomUUID().toString();
         this.name = name;
         this.email = email;
         this.password = password;
-        this.token = UUID.randomUUID().toString(); // z.B. generierter Token
     }
 
     // Getter/Setter
-    public String getId() {
+    public Long getId() {
         return id;
     }
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -58,4 +52,3 @@ public class User {
         this.token = token;
     }
 }
-

@@ -2,23 +2,16 @@ package com.hszg.demo.model;
 
 public class Exercise {
 
-    private Long id;          // einfache ID
+    private String title;
+    private String start;        // Datum/Start, z.B. "2023-02-10"
+    private Integer weight;
+    private Integer repetitions;
+    private Integer sets;
 
-    // Felder, die FullCalendar nutzt
-    private String title;     // z.B. "Bizepscurls"
-    private String start;     // z.B. "2025-01-31" (nur Datum) oder "2025-01-31T00:00:00"
+    public Exercise() {
+    }
 
-    // Zusätzliche Felder fürs Training
-    private int weight;       // Gewicht in kg
-    private int repetitions;  // Anzahl Wiederholungen
-    private int sets;         // Anzahl Sätze
-
-    // Leerer Konstruktor
-    public Exercise() {}
-
-    // Voll-Konstruktor
-    public Exercise(Long id, String title, String start, int weight, int repetitions, int sets) {
-        this.id = id;
+    public Exercise(String title, String start, Integer weight, Integer repetitions, Integer sets) {
         this.title = title;
         this.start = start;
         this.weight = weight;
@@ -26,14 +19,7 @@ public class Exercise {
         this.sets = sets;
     }
 
-    // Getter & Setter
-    public Long getId() {
-        return id;
-    }
-    public void setId(Long id) {
-        this.id = id;
-    }
-
+    // Getter / Setter
     public String getTitle() {
         return title;
     }
@@ -41,10 +27,6 @@ public class Exercise {
         this.title = title;
     }
 
-    /**
-     * Falls du im Frontend nur "2025-02-01" sendest, dann interpretiert FullCalendar das als All-Day-Event.
-     * Wenn du "2025-02-01T12:00:00" sendest, bekommt man eine genaue Uhrzeit.
-     */
     public String getStart() {
         return start;
     }
@@ -52,24 +34,24 @@ public class Exercise {
         this.start = start;
     }
 
-    public int getWeight() {
+    public Integer getWeight() {
         return weight;
     }
-    public void setWeight(int weight) {
+    public void setWeight(Integer weight) {
         this.weight = weight;
     }
 
-    public int getRepetitions() {
+    public Integer getRepetitions() {
         return repetitions;
     }
-    public void setRepetitions(int repetitions) {
+    public void setRepetitions(Integer repetitions) {
         this.repetitions = repetitions;
     }
 
-    public int getSets() {
+    public Integer getSets() {
         return sets;
     }
-    public void setSets(int sets) {
+    public void setSets(Integer sets) {
         this.sets = sets;
     }
 }

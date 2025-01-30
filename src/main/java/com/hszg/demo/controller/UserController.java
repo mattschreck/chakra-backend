@@ -46,14 +46,14 @@ public class UserController {
         User user = userManager.loginUser(email, password);
         if (user != null) {
             response.put("success", true);
-            response.put("message", "Login erfolgreich");
+            response.put("message", "Login erfolgreich!");
             response.put("token", user.getToken());
             response.put("userId", user.getId());
             response.put("name", user.getName());
             response.put("email", user.getEmail());
         } else {
             response.put("success", false);
-            response.put("message", "E-Mail oder Passwort falsch");
+            response.put("message", "E-Mail oder Passwort falsch!");
         }
         return response;
     }
