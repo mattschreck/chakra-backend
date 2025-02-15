@@ -3,7 +3,7 @@ package com.hszg.demo.data.impl;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Utility-Klasse für das Speichern & Laden einer .properties-Datei.
@@ -52,4 +52,20 @@ public class PropertiesStorage {
         props.remove(key);
         save();
     }
+    // In class PropertiesStorage:
+
+    public List<String> getAllEmails() {
+        Set<String> keys = props.stringPropertyNames(); // props is a java.util.Properties
+        Set<String> emails = new HashSet<>();
+        for (String key : keys) {
+            // key looks like "user.someemail@... .id"
+            if (key.startsWith("user.") && key.endsWith(".id")) {
+                // extract the email part
+                String emailPart = key.substring("user.".length(), key.lastIndexOf(".id"));
+                emails.add(emailPart);
+            }
+        }
+        return new ArrayList<>(emails);
+    }
+
 }
