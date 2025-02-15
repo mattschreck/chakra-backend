@@ -39,6 +39,9 @@ public class PropertiesExerciseManagerImpl implements ExerciseManager {
             String weightStr = storage.get(prefix + ".weight");
             String repsStr   = storage.get(prefix + ".repetitions");
             String setsStr   = storage.get(prefix + ".sets");
+            String bodyPart = storage.get(prefix + ".bodyPart");
+
+
 
             Exercise e = new Exercise();
             e.setId(id);
@@ -47,6 +50,7 @@ public class PropertiesExerciseManagerImpl implements ExerciseManager {
             e.setWeight(weightStr == null ? null : Integer.valueOf(weightStr));
             e.setRepetitions(repsStr == null ? null : Integer.valueOf(repsStr));
             e.setSets(setsStr == null ? null : Integer.valueOf(setsStr));
+            e.setBodyPart(bodyPart);
 
             result.add(e);
         }
@@ -76,6 +80,9 @@ public class PropertiesExerciseManagerImpl implements ExerciseManager {
         storage.put(prefix + ".weight", exercise.getWeight() == null ? "" : exercise.getWeight().toString());
         storage.put(prefix + ".repetitions", exercise.getRepetitions() == null ? "" : exercise.getRepetitions().toString());
         storage.put(prefix + ".sets", exercise.getSets() == null ? "" : exercise.getSets().toString());
+        storage.put(prefix + ".bodyPart",
+                exercise.getBodyPart() == null ? "" : exercise.getBodyPart());
+
 
         return exercise;
     }

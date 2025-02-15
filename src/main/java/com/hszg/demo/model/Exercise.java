@@ -7,6 +7,7 @@ public class Exercise {
     private Integer weight;
     private Integer repetitions;
     private Integer sets;
+    private String bodyPart;    // Neu: z. B. "Beine", "Rücken", "Brust"
 
     public Exercise() {
     }
@@ -20,6 +21,7 @@ public class Exercise {
         this.weight = weight;
         this.repetitions = repetitions;
         this.sets = sets;
+        this.bodyPart = bodyPart;
     }
 
     // Getter/Setter
@@ -40,4 +42,11 @@ public class Exercise {
 
     public Integer getSets() { return sets; }
     public void setSets(Integer sets) { this.sets = sets; }
+
+    public String getBodyPart() {
+        return bodyPart;
+    }
+    public void setBodyPart(String bodyPart) {
+        this.bodyPart = bodyPart;
+    }
 }

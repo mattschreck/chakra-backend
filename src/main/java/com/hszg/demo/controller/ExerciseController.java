@@ -5,7 +5,8 @@ import com.hszg.demo.model.Exercise;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.time.LocalDate;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/exercises")
@@ -31,7 +32,7 @@ public class ExerciseController {
         return exerciseManager.addExercise(userId, exercise);
     }
 
-    // NEU: DELETE /api/exercises/{userId}/{exerciseId}
+    // DELETE /api/exercises/{userId}/{exerciseId}
     @DeleteMapping("/{userId}/{exerciseId}")
     public DeleteResponse deleteExercise(@PathVariable Long userId,
                                          @PathVariable String exerciseId) {
@@ -43,7 +44,30 @@ public class ExerciseController {
         }
     }
 
-    // Kleiner Hilfs-Datentransfer für die JSON-Antwort
+    // NEU: Stats
+    // GET /api/exercises/{userId}/stats?start=YYYY-MM-DD&end=YYYY-MM-DD
+    @GetMapping("/{userId}/stats")
+    public Map<String, Integer> getStatsForUser(@PathVariable Long userId,
+                                                @RequestParam String start,
+                                                @RequestParam String end) {
+        List<Exercise> all = exerciseManager.getAllExercisesForUser(userId);
+        LocalDate startDate = LocalDate.parse(start);
+        LocalDate endDate = LocalDate.parse(end);
+
+        Map<String, Integer> result = new HashMap<>();
+        for (Exercise e : all) {
+            if (e.getStart() == null || e.getBodyPart() == null) continue;
+            LocalDate d = LocalDate.parse(e.getStart());
+
+            // check range
+            if (!d.isBefore(startDate) && !d.isAfter(endDate)) {
+                String bp = e.getBodyPart();
+                result.put(bp, result.getOrDefault(bp, 0) + 1);
+            }
+        }
+        return result;
+    }
+
     static class DeleteResponse {
         public boolean success;
         public String message;
