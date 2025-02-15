@@ -15,11 +15,10 @@ public class PropertiesUserManagerImpl implements UserManager {
 
     @Override
     public User registerUser(String name, String email, String password) throws Exception {
-        // Check: E-Mail existiert schon?
         if (findByEmail(email) != null) {
             throw new Exception("E-Mail bereits vorhanden!");
         }
-        long pseudoId = System.currentTimeMillis(); // Beispiel
+        long pseudoId = System.currentTimeMillis();
         User newUser = new User(name, email, password);
         newUser.setId(pseudoId);
 
@@ -28,7 +27,6 @@ public class PropertiesUserManagerImpl implements UserManager {
         storage.put(prefix + ".name", name);
         storage.put(prefix + ".password", password);
 
-        // optional: token oder andere Felder
         return newUser;
     }
 
@@ -51,25 +49,24 @@ public class PropertiesUserManagerImpl implements UserManager {
 
         User u = new User();
         u.setId(Long.valueOf(idStr));
-        u.setEmail(email);
         u.setName(storage.get(prefix + ".name"));
+        u.setEmail(email);
         u.setPassword(storage.get(prefix + ".password"));
         return u;
     }
 
     @Override
     public User updateUser(Long userId, String newEmail, String newPassword) throws Exception {
-        // 1) Finde den User per userId
+        // Finde den User
         User current = findByUserId(userId);
         if (current == null) {
-            return null; // user not found
+            return null; // => "User nicht gefunden"
         }
 
-        // 2) E-Mail ändern?
+        // E-Mail ändern?
         if (newEmail != null && !newEmail.trim().isEmpty()
                 && !newEmail.equalsIgnoreCase(current.getEmail())) {
 
-            // Check: existiert newEmail schon?
             if (findByEmail(newEmail) != null) {
                 throw new Exception("Diese E-Mail ist bereits vergeben!");
             }
@@ -83,35 +80,32 @@ public class PropertiesUserManagerImpl implements UserManager {
             // Neue Keys
             String newPrefix = "user." + newEmail;
             storage.put(newPrefix + ".id", String.valueOf(current.getId()));
-            // Name bleibt
             storage.put(newPrefix + ".name", current.getName() == null ? "" : current.getName());
-            // PW bleibt
             storage.put(newPrefix + ".password", current.getPassword() == null ? "" : current.getPassword());
 
-            // E-Mail im Objekt aktualisieren
+            // Im User-Objekt ändern
             current.setEmail(newEmail);
         }
 
-        // 3) Passwort ändern?
+        // Passwort ändern?
         if (newPassword != null && !newPassword.trim().isEmpty()) {
             current.setPassword(newPassword);
         }
 
-        // 4) Speichern: prefix = user.<aktuelleEmail>
+        // Speichern (prefix = user.<aktuelleEmail>)
         String prefix = "user." + current.getEmail();
-        storage.put(prefix + ".password", current.getPassword());
-
-        // Falls du Name änderst, kannst du das hier auch abfragen.
+        storage.put(prefix + ".name", current.getName() == null ? "" : current.getName());
+        storage.put(prefix + ".password", current.getPassword() == null ? "" : current.getPassword());
 
         return current;
     }
 
-    // Hilfsmethode: user suchen per ID
-    private User findByUserId(Long id) {
-        // wir durchforsten alle user.*.id
+    // Hilfsmethode: user per ID finden
+    private User findByUserId(Long wantedId) {
         for (String email : storage.getAllEmails()) {
             User u = findByEmail(email);
-            if (u != null && u.getId() == id) {
+            if (u != null && u.getId().equals(wantedId)) {
+                // Achte auf .equals(...) statt '=='
                 return u;
             }
         }
