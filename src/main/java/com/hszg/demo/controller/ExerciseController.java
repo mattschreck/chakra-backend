@@ -6,7 +6,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/exercises")
@@ -28,7 +30,9 @@ public class ExerciseController {
     // POST /api/exercises/{userId}
     @PostMapping("/{userId}")
     @ResponseStatus(HttpStatus.CREATED)
-    public Exercise createExercise(@PathVariable Long userId, @RequestBody Exercise exercise) {
+    public Exercise createExercise(@PathVariable Long userId,
+                                   @RequestBody Exercise exercise) {
+        // Hier z. B. set ID und so macht manager
         return exerciseManager.addExercise(userId, exercise);
     }
 
@@ -44,27 +48,30 @@ public class ExerciseController {
         }
     }
 
-    // NEU: Stats
     // GET /api/exercises/{userId}/stats?start=YYYY-MM-DD&end=YYYY-MM-DD
     @GetMapping("/{userId}/stats")
     public Map<String, Integer> getStatsForUser(@PathVariable Long userId,
                                                 @RequestParam String start,
                                                 @RequestParam String end) {
         List<Exercise> all = exerciseManager.getAllExercisesForUser(userId);
+
         LocalDate startDate = LocalDate.parse(start);
         LocalDate endDate = LocalDate.parse(end);
 
         Map<String, Integer> result = new HashMap<>();
-        for (Exercise e : all) {
-            if (e.getStart() == null || e.getBodyPart() == null) continue;
-            LocalDate d = LocalDate.parse(e.getStart());
 
-            // check range
+        for (Exercise e : all) {
+            if (e.getStart() == null || e.getBodyPart() == null) {
+                continue;
+            }
+            LocalDate d = LocalDate.parse(e.getStart());
+            // Datum-Check
             if (!d.isBefore(startDate) && !d.isAfter(endDate)) {
                 String bp = e.getBodyPart();
                 result.put(bp, result.getOrDefault(bp, 0) + 1);
             }
         }
+
         return result;
     }
 
