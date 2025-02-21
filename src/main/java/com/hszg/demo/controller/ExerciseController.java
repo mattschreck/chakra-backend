@@ -15,6 +15,7 @@ import java.util.Map;
 @CrossOrigin(origins = "*")
 public class ExerciseController {
 
+    // Manager zur Verwaltung der Übungen
     private final ExerciseManager exerciseManager;
 
     public ExerciseController(ExerciseManager exerciseManager) {
@@ -22,21 +23,24 @@ public class ExerciseController {
     }
 
     // GET /api/exercises/{userId}
+    // Ruft alle Übungen eines Benutzers ab
     @GetMapping("/{userId}")
     public List<Exercise> getAllExercisesForUser(@PathVariable Long userId) {
         return exerciseManager.getAllExercisesForUser(userId);
     }
 
     // POST /api/exercises/{userId}
+    // Erstellt eine neue Übung für den Benutzer
     @PostMapping("/{userId}")
     @ResponseStatus(HttpStatus.CREATED)
     public Exercise createExercise(@PathVariable Long userId,
                                    @RequestBody Exercise exercise) {
-        // Hier z. B. set ID und so macht manager
+        // Neue Übung hinzufügen (z.B. Setzen der ID etc.)
         return exerciseManager.addExercise(userId, exercise);
     }
 
     // DELETE /api/exercises/{userId}/{exerciseId}
+    // Löscht eine Übung anhand der Übungs-ID
     @DeleteMapping("/{userId}/{exerciseId}")
     public DeleteResponse deleteExercise(@PathVariable Long userId,
                                          @PathVariable String exerciseId) {
@@ -49,6 +53,7 @@ public class ExerciseController {
     }
 
     // GET /api/exercises/{userId}/stats?start=YYYY-MM-DD&end=YYYY-MM-DD
+    // Ermittelt Statistiken (Übungen pro Körperpartie) im angegebenen Zeitraum
     @GetMapping("/{userId}/stats")
     public Map<String, Integer> getStatsForUser(@PathVariable Long userId,
                                                 @RequestParam String start,
@@ -62,10 +67,10 @@ public class ExerciseController {
 
         for (Exercise e : all) {
             if (e.getStart() == null || e.getBodyPart() == null) {
-                continue;
+                continue;  // Überspringt Übungen ohne Datum oder Körperpartie
             }
             LocalDate d = LocalDate.parse(e.getStart());
-            // Datum-Check
+            // Prüft, ob das Datum im Bereich liegt
             if (!d.isBefore(startDate) && !d.isAfter(endDate)) {
                 String bp = e.getBodyPart();
                 result.put(bp, result.getOrDefault(bp, 0) + 1);
@@ -75,6 +80,7 @@ public class ExerciseController {
         return result;
     }
 
+    // Hilfsklasse für die Antwort beim Löschen einer Übung
     static class DeleteResponse {
         public boolean success;
         public String message;

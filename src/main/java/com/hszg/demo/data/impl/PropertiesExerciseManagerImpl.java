@@ -11,6 +11,7 @@ import java.util.UUID;
 @Service
 public class PropertiesExerciseManagerImpl implements ExerciseManager {
 
+    // Speicher, in dem die Übungsdaten abgelegt werden
     private final PropertiesStorage storage;
 
     public PropertiesExerciseManagerImpl(PropertiesStorage storage) {
@@ -19,7 +20,7 @@ public class PropertiesExerciseManagerImpl implements ExerciseManager {
 
     @Override
     public List<Exercise> getAllExercisesForUser(Long userId) {
-        // IDs laden: exercises.<userId>.list
+        // Schlüssel für die Liste der Übungs-IDs für den Benutzer
         String listKey = "exercises." + userId + ".list";
         String idList = storage.get(listKey);
         if (idList == null || idList.trim().isEmpty()) {
@@ -31,18 +32,18 @@ public class PropertiesExerciseManagerImpl implements ExerciseManager {
         for (String id : ids) {
             String prefix = "exercises." + userId + "." + id;
 
+            // Übungsfelder laden
             String title = storage.get(prefix + ".title");
             if (title == null) {
-                continue; // Falls gelöscht oder fehlerhaft
+                continue; // Übung ignorieren, wenn der Titel fehlt (z.B. gelöscht)
             }
             String start = storage.get(prefix + ".start");
             String weightStr = storage.get(prefix + ".weight");
-            String repsStr   = storage.get(prefix + ".repetitions");
-            String setsStr   = storage.get(prefix + ".sets");
+            String repsStr = storage.get(prefix + ".repetitions");
+            String setsStr = storage.get(prefix + ".sets");
             String bodyPart = storage.get(prefix + ".bodyPart");
 
-
-
+            // Neue Exercise-Instanz befüllen
             Exercise e = new Exercise();
             e.setId(id);
             e.setTitle(title);
@@ -59,11 +60,11 @@ public class PropertiesExerciseManagerImpl implements ExerciseManager {
 
     @Override
     public Exercise addExercise(Long userId, Exercise exercise) {
-        // Erzeuge zufällige ID
+        // Erzeuge eine zufällige ID für die neue Übung
         String newId = UUID.randomUUID().toString();
         exercise.setId(newId);
 
-        // In die IDs-Liste eintragen
+        // Übungs-ID in die bestehende Liste eintragen
         String listKey = "exercises." + userId + ".list";
         String currentList = storage.get(listKey);
         if (currentList == null || currentList.trim().isEmpty()) {
@@ -73,37 +74,36 @@ public class PropertiesExerciseManagerImpl implements ExerciseManager {
         }
         storage.put(listKey, currentList);
 
-        // Felder speichern
+        // Übungsfelder in den Speicher schreiben
         String prefix = "exercises." + userId + "." + newId;
         storage.put(prefix + ".title", exercise.getTitle() == null ? "" : exercise.getTitle());
         storage.put(prefix + ".start", exercise.getStart() == null ? "" : exercise.getStart());
         storage.put(prefix + ".weight", exercise.getWeight() == null ? "" : exercise.getWeight().toString());
         storage.put(prefix + ".repetitions", exercise.getRepetitions() == null ? "" : exercise.getRepetitions().toString());
         storage.put(prefix + ".sets", exercise.getSets() == null ? "" : exercise.getSets().toString());
-        storage.put(prefix + ".bodyPart",
-                exercise.getBodyPart() == null ? "" : exercise.getBodyPart());
-
+        storage.put(prefix + ".bodyPart", exercise.getBodyPart() == null ? "" : exercise.getBodyPart());
 
         return exercise;
     }
 
     @Override
     public boolean deleteExercise(Long userId, String exerciseId) {
-        // Lade Liste
+        // Lade die Liste der Übungs-IDs
         String listKey = "exercises." + userId + ".list";
         String idList = storage.get(listKey);
         if (idList == null || idList.isEmpty()) {
-            return false; // Nichts zu löschen
+            return false; // Nichts zu löschen, Liste ist leer
         }
 
         String[] ids = idList.split(",");
         StringBuilder newList = new StringBuilder();
         boolean found = false;
 
+        // Erstelle eine neue Liste ohne die zu löschende ID
         for (String id : ids) {
             if (id.equals(exerciseId)) {
                 found = true;
-                // nicht in newList aufnehmen
+                // Diese ID nicht übernehmen
             } else {
                 if (newList.length() > 0) newList.append(",");
                 newList.append(id);
@@ -111,13 +111,13 @@ public class PropertiesExerciseManagerImpl implements ExerciseManager {
         }
 
         if (!found) {
-            return false; // ID nicht vorhanden
+            return false; // Übungs-ID nicht gefunden
         }
 
-        // Neue Liste speichern
+        // Speichere die aktualisierte Liste
         storage.put(listKey, newList.toString());
 
-        // Properties entfernen
+        // Entferne alle Eigenschaften der Übung
         String prefix = "exercises." + userId + "." + exerciseId;
         storage.remove(prefix + ".title");
         storage.remove(prefix + ".start");

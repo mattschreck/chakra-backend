@@ -7,12 +7,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class PropertiesUserManagerImpl implements UserManager {
 
+    // Speicher für Benutzerdaten
     private final PropertiesStorage storage;
 
     public PropertiesUserManagerImpl(PropertiesStorage storage) {
         this.storage = storage;
     }
 
+    // Registriert einen neuen Benutzer
     @Override
     public User registerUser(String name, String email, String password) throws Exception {
         if (findByEmail(email) != null) {
@@ -30,6 +32,7 @@ public class PropertiesUserManagerImpl implements UserManager {
         return newUser;
     }
 
+    // Meldet einen Benutzer an
     @Override
     public User loginUser(String email, String password) {
         User found = findByEmail(email);
@@ -39,6 +42,7 @@ public class PropertiesUserManagerImpl implements UserManager {
         return null;
     }
 
+    // Sucht einen Benutzer anhand der E-Mail
     @Override
     public User findByEmail(String email) {
         String prefix = "user." + email;
@@ -46,7 +50,6 @@ public class PropertiesUserManagerImpl implements UserManager {
         if (idStr == null) {
             return null;
         }
-
         User u = new User();
         u.setId(Long.valueOf(idStr));
         u.setName(storage.get(prefix + ".name"));
@@ -55,15 +58,16 @@ public class PropertiesUserManagerImpl implements UserManager {
         return u;
     }
 
+    // Aktualisiert die Daten eines Benutzers (E-Mail und/oder Passwort)
     @Override
     public User updateUser(Long userId, String newEmail, String newPassword) throws Exception {
-        // Finde den User
+        // Benutzer anhand der ID suchen
         User current = findByUserId(userId);
         if (current == null) {
-            return null; // => "User nicht gefunden"
+            return null; // Benutzer nicht gefunden
         }
 
-        // E-Mail ändern?
+        // E-Mail ändern, wenn nötig
         if (newEmail != null && !newEmail.trim().isEmpty()
                 && !newEmail.equalsIgnoreCase(current.getEmail())) {
 
@@ -71,28 +75,27 @@ public class PropertiesUserManagerImpl implements UserManager {
                 throw new Exception("Diese E-Mail ist bereits vergeben!");
             }
 
-            // Alte Keys löschen
+            // Alte Einträge löschen
             String oldPrefix = "user." + current.getEmail();
             storage.remove(oldPrefix + ".id");
             storage.remove(oldPrefix + ".name");
             storage.remove(oldPrefix + ".password");
 
-            // Neue Keys
+            // Neue Einträge speichern
             String newPrefix = "user." + newEmail;
             storage.put(newPrefix + ".id", String.valueOf(current.getId()));
             storage.put(newPrefix + ".name", current.getName() == null ? "" : current.getName());
             storage.put(newPrefix + ".password", current.getPassword() == null ? "" : current.getPassword());
 
-            // Im User-Objekt ändern
             current.setEmail(newEmail);
         }
 
-        // Passwort ändern?
+        // Passwort ändern, wenn angegeben
         if (newPassword != null && !newPassword.trim().isEmpty()) {
             current.setPassword(newPassword);
         }
 
-        // Speichern (prefix = user.<aktuelleEmail>)
+        // Aktualisierte Daten speichern
         String prefix = "user." + current.getEmail();
         storage.put(prefix + ".name", current.getName() == null ? "" : current.getName());
         storage.put(prefix + ".password", current.getPassword() == null ? "" : current.getPassword());
@@ -100,12 +103,11 @@ public class PropertiesUserManagerImpl implements UserManager {
         return current;
     }
 
-    // Hilfsmethode: user per ID finden
+    // Hilfsmethode: Sucht einen Benutzer anhand der ID
     private User findByUserId(Long wantedId) {
         for (String email : storage.getAllEmails()) {
             User u = findByEmail(email);
             if (u != null && u.getId().equals(wantedId)) {
-                // Achte auf .equals(...) statt '=='
                 return u;
             }
         }

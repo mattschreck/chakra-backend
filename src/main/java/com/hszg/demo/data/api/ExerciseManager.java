@@ -8,6 +8,6 @@ public interface ExerciseManager {
     List<Exercise> getAllExercisesForUser(Long userId);
     Exercise addExercise(Long userId, Exercise exercise);
 
-    // Neu: Zum Löschen
+    //Zum Löschen
     boolean deleteExercise(Long userId, String exerciseId);
 }

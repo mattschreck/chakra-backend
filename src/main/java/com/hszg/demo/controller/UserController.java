@@ -12,12 +12,15 @@ import java.util.Map;
 @CrossOrigin(origins = "*")
 public class UserController {
 
+    // Instanz des UserManager, der die Benutzerlogik übernimmt
     private final UserManager userManager;
 
     public UserController(UserManager userManager) {
         this.userManager = userManager;
     }
 
+    // POST /api/users/register
+    // Registriert einen neuen Benutzer
     @PostMapping("/register")
     public Map<String, Object> register(@RequestBody Map<String, String> payload) {
         Map<String, Object> response = new HashMap<>();
@@ -37,6 +40,8 @@ public class UserController {
         return response;
     }
 
+    // POST /api/users/login
+    // Meldet einen Benutzer an
     @PostMapping("/login")
     public Map<String, Object> login(@RequestBody Map<String, String> payload) {
         Map<String, Object> response = new HashMap<>();
@@ -58,7 +63,8 @@ public class UserController {
         return response;
     }
 
-    // Update: E-Mail / Passwort
+    // PUT /api/users/{userId}
+    // Aktualisiert die E-Mail und/oder das Passwort eines Benutzers
     @PutMapping("/{userId}")
     public Map<String, Object> updateUser(@PathVariable Long userId,
                                           @RequestBody Map<String, String> payload) {
